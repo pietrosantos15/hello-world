@@ -1,12 +1,11 @@
 // app/components/Questionario.tsx
 "use client";
-
 import React, { useEffect, useState } from "react";
-import { Question } from "../../../.next/types/quiz"; // Ajuste o caminho conforme necessário
+import { Question } from "../../types/quiz";
 
 type QuestionarioProps = {
   topic: string;
-  onFinish: (result: { correct: number; total: number; answers: number[] }) => void;
+  onFinish: (result: { correct: number; total: number; answers: number[]; questions: Question[] }) => void;
 };
 
 const Questionario: React.FC<QuestionarioProps> = ({ topic, onFinish }) => {
@@ -56,23 +55,28 @@ const Questionario: React.FC<QuestionarioProps> = ({ topic, onFinish }) => {
       (acc, q, idx) => acc + (q.correctAnswer === userAnswers[idx] ? 1 : 0),
       0
     );
-    onFinish({ correct, total: questions.length, answers: userAnswers });
+    onFinish({
+      correct,
+      total: questions.length,
+      answers: userAnswers,
+      questions
+    });
   };
 
-  if (loading) return <div className="text-center mt-10">Carregando perguntas...</div>;
+  if (loading) return <div className="text-center mt-10 text-black">Carregando perguntas...</div>;
   if (error) return <div className="text-center mt-10 text-red-600">{error}</div>;
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl mx-auto mt-8 space-y-8">
       {questions.map((q, qIdx) => (
         <div key={q.id || qIdx} className="bg-white p-4 rounded shadow">
-          <p className=" mb-2 text-black">{qIdx + 1}. {q.question}</p>
+          <p className="font-semibold mb-2 text-black">{qIdx + 1}. {q.question}</p>
           <div className="grid grid-cols-1 gap-2">
             {q.options.map((opt: string, optIdx: number) => (
               <label
                 key={optIdx}
-                className={`flex items-center gap-2 p-2 rounded cursor-pointer ${
-                  userAnswers[qIdx] === optIdx ? "bg-blue-400" : ""
+                className={`flex items-center gap-2 p-2 rounded cursor-pointer text-black ${
+                  userAnswers[qIdx] === optIdx ? "bg-blue-100 text-black" : ""
                 }`}
               >
                 <input
